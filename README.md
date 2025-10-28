@@ -1,2 +1,48 @@
-# project-2_Sedinkin_M25-555
-The database system developed during Python course
+# My database
+
+Консольная СУБД, осень 2025 года
+
+---
+
+## Содержание
+
+- [Описание](#-описание)
+- [Установка и запуск](#-установка-и-запуск)
+
+---
+
+## Описание
+
+Этот проект демонстрирует владение ООП в Python.
+
+---
+
+## Установка и запуск
+
+Проект использует [Poetry](https://python-poetry.org/) для управления зависимостями и виртуальным окружением.
+
+### Требования
+- Python ≥ 3.12
+- Poetry ≥ 2.2
+
+### Шаги
+
+1. **Клонируйте репозиторий**
+   ```bash
+   git clone https://github.com/Easycoding-art/project-1_Sedinkin_M25-555.git
+   ```
+
+2. **Установите зависимости**
+   ```bash
+   poetry install
+   ```
+
+3. **Активируйте виртуальное окружение и запустите игру**
+   ```bash
+   make install
+   make package-install
+   make build
+   make project
+   ```
+
+---
