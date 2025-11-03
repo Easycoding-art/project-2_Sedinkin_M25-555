@@ -1,7 +1,4 @@
 import json
-'''
-Вся информация о таблицах (их имена и структура столбцов) будет храниться в одном файле, например, db_meta.json.
-'''
  
 def load_metadata(filepath):
     '''
@@ -22,3 +19,23 @@ def save_metadata(filepath, data):
     '''
     with open(filepath, 'w') as file:
         json.dump(data, file)
+
+def save_table_data(table_name, data):
+    '''
+    Сохраняет таблицу в JSON-файл.
+    '''
+    with open(f'{table_name}.json', 'w') as file:
+        json.dump(data, file)
+
+def load_table_data(table_name):
+    '''
+    Загружает таблицу из JSON-файла.
+    Если файл не найден, возвращает пустой словарь {}.
+    Используйте try...except FileNotFoundError.
+    '''
+    try:
+        with open(f'{table_name}.json', 'r') as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        return {}
