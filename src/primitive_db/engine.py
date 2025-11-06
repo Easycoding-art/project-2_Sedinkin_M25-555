@@ -3,6 +3,8 @@ import shlex
 from src.primitive_db.utils import load_metadata, save_metadata, load_table_data, save_table_data
 from src.primitive_db.core import *
 from prettytable import PrettyTable
+from src.decorators import create_cacher
+import os
 
 def print_help():
     """Prints the help message for the current mode."""
@@ -36,28 +38,37 @@ def welcome():
 def run():
     db_name = welcome()
     file_path = 'db_meta.json'
+    folder_path = "data"
+    os.makedirs(folder_path, exist_ok=True)
     metadata = load_metadata(file_path)
     if db_name not in metadata.keys():
         metadata.update({db_name : {}})
         save_metadata(file_path, metadata)
-    db_metadata = metadata.get(db_name)
     while True:
+        db_metadata = metadata.get(db_name)
         query = prompt.string('Введите команду: ')
         args = shlex.split(query)
-        print(args)
-        #args = query.split()
         match args[0]:
-            case 'create':
-                create_table()
-            case 'drop':
-                drop_table()
+            case 'create_table':
+                table_info = {val.split(':')[0] : val.split(':')[1] for val in args[2:]}
+                db_metadata = create_table(db_metadata, args[1], table_info)
+                metadata.update({db_name : db_metadata})
+                save_metadata(file_path, metadata)
+            case 'drop_table':
+                db_metadata = drop_table(db_metadata, args[1])
+                metadata.update({db_name : db_metadata})
+                save_metadata(file_path, metadata)
             case 'list_tables':
-                table_str = ', '.join(list_tables())
+                table_str = ', '.join(list_tables(db_metadata))
                 print(f'Список таблиц:\n{table_str}')
             case 'info':
-                info()
+                print(info(db_metadata, args[1]))
             case 'select':
-                dct = select()#add
+                table_data = load_table_data(f'data/{args[2]}')
+                select_cached = create_cacher(select)
+                condition  = (args[4], args[6]) if len(args) == 7 else None
+                key = f'{args[2]} = {condition}'
+                dct = select_cached(key, table_data, condition)
                 table = PrettyTable()
                 for c in dct.keys():
                     table.add_column(c, [])
@@ -65,11 +76,19 @@ def run():
                 table.add_row(['\n'.join(to_str(dct[c])) for c in dct.keys()])
                 print(table)
             case 'update':
-                update()#add
+                table_data = load_table_data(f'data/{args[1]}')
+                new_table_data = update(table_data, (args[3], args[5]), (args[7], args[9]))
+                save_table_data(f'data/{args[1]}', new_table_data)
             case 'delete':
-                delete()#add
+                table_data = load_table_data(f'data/{args[2]}')
+                new_table_data = delete(table_data, (args[4], args[6]))
+                save_table_data(f'data/{args[2]}', new_table_data)
             case 'insert':
-                insert()#add
+                values = [args[4][1:-1]]
+                values.extend([v[1:-1] for v in args[5:-1]])
+                values.append(args[-1][:-1])
+                new_table_data = insert(db_metadata, args[2], values)
+                save_table_data(f'data/{args[2]}', new_table_data)
             case 'exit':
                 break
             case 'help':
