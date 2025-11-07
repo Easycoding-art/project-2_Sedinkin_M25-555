@@ -1,5 +1,7 @@
 import time
+
 import prompt
+
 
 def handle_db_errors(func):
     def wrapper(*args, **kwargs):

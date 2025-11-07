@@ -1,12 +1,10 @@
-from src.primitive_db.utils import load_metadata, save_metadata, load_table_data, save_table_data
-from src.decorators import *
-    
+from src.decorators import confirm_action, log_time
+from src.primitive_db.utils import load_table_data
+
+
 def create_table(metadata, table_name, columns):
     '''
-    Она должна принимать текущие метаданные, имя таблицы и список столбцов.
     Автоматически добавлять столбец ID:int в начало списка столбцов.
-    Проверять, не существует ли уже таблица с таким именем. Если да, выводить ошибку.
-    Проверять корректность типов данных (только int, str, bool).
     В случае успеха, обновлять словарь metadata и возвращать его.
     '''
     if table_name in metadata.keys():
@@ -65,7 +63,7 @@ def select(table_data, where_clause=None):
     Если where_clause не задан, возвращает все данные.
     Фильтрует и возвращает только подходящие записи.
     '''
-    if where_clause != None:
+    if where_clause is not None:
         result = {}
         filter_arr = table_data.get(where_clause[0])
         this_type = type(filter_arr[0])
